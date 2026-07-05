@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Joglo Sablon Kaos Blitar</title>
+  <!-- Robots: jangan diindex oleh mesin pencari -->
+  <meta name="robots" content="noindex, nofollow, noarchive" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --red: #C0392B;
+      --red-light: #E74C3C;
+      --bg: #0D0D0D;
+      --surface: #141414;
+      --surface2: #1C1C1C;
+      --border: #2A2A2A;
+      --text: #F5F5F5;
+      --text2: #A0A0A0;
+      --green: #27AE60;
+      --blue: #2980B9;
+      --sidebar-w: 220px;
+      --header-h: 60px;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ===== LOGIN OVERLAY ===== */
+    #login-overlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse at center, #1a0a0a 0%, #0D0D0D 70%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+
+    .login-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px 36px;
+      width: 360px;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.8), 0 0 0 1px rgba(192,57,43,0.1);
+      animation: fadeInUp 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px) scale(0.95); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .login-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .login-logo-dot {
+      width: 14px; height: 14px;
+      background: var(--red);
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.6;transform:scale(1.3)} }
+
+    .login-logo-text h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .login-logo-text span {
+      font-size: 12px;
+      color: var(--text2);
+    }
+
+    .login-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .login-subtitle {
+      font-size: 13px;
+      color: var(--text2);
+      margin-bottom: 28px;
+      line-height: 1.5;
+    }
+
+    .login-field {
+      position: relative;
+      margin-bottom: 16px;
+    }
+
+    .login-field label {
+      display: block;
+      font-family: 'Outfit', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text2);
+      margin-bottom: 8px;
+    }
+
+    .login-field input {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      padding: 12px 44px 12px 16px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .login-field input:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(192,57,43,0.12);
+    }
+
+    .login-field .eye-toggle {
+      position: absolute;
+      right: 12px;
+      bottom: 12px;
+      background: none;
+      border: none;
+      color: var(--text2);
+      cursor: pointer;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      transition: color 0.2s;
+    }
+
+    .login-field .eye-toggle:hover { color: var(--text); }
+
+    .login-error {
+      background: rgba(192,57,43,0.12);
+      border: 1px solid rgba(192,57,43,0.3);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 12px;
+      color: #E74C3C;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: none;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .login-error.show { display: flex; }
+
+    .login-btn {
+      width: 100%;
+      background: var(--red);
+      color: white;
+      font-family: 'Outfit', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 13px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-top: 8px;
+      letter-spacing: 0.3px;
+    }
+
+    .login-btn:hover {
+      background: var(--red-light);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 24px rgba(192,57,43,0.35);
+    }
+
+    .login-btn:active { transform: translateY(0); }
+
+    .login-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .login-shake {
+      animation: shake 0.4s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+
+    .login-footer {
+      text-align: center;
+      font-size: 11px;
+      color: #444;
+      margin-top: 20px;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    /* ===== ADMIN PANEL (hidden until logged in) ===== */
+    #admin-panel {
+      display: none;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    #admin-panel.visible { display: flex; }
+
+    /* ===== HEADER ===== */
+    .admin-header {
+      height: var(--header-h);
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      flex-shrink: 0;
+      z-index: 100;
+    }
+
+    .admin-header-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .admin-header-brand .logo-dot {
+      width: 10px; height: 10px;
+      background: var(--red);
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .admin-header-brand h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .admin-header-brand span {
+      font-size: 12px;
+      color: var(--text2);
+      font-weight: 400;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-red { background: var(--red); color: white; }
+    .btn-red:hover { background: var(--red-light); }
+    .btn-green { background: var(--green); color: white; }
+    .btn-green:hover { background: #2ecc71; }
+    .btn-ghost { background: transparent; color: var(--text2); border: 1px solid var(--border); }
+    .btn-ghost:hover { border-color: var(--red); color: var(--text); }
+    .btn-blue { background: var(--blue); color: white; }
+    .btn-blue:hover { background: #3498DB; }
+    .btn-logout { background: rgba(192,57,43,0.1); color: var(--red-light); border: 1px solid rgba(192,57,43,0.2); }
+    .btn-logout:hover { background: var(--red); color: white; border-color: var(--red); }
+
+    /* ===== LAYOUT ===== */
+    .admin-body {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* ===== SIDEBAR ===== */
+    .admin-sidebar {
+      width: var(--sidebar-w);
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+
+    .sidebar-section-label {
+      font-family: 'Outfit', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text2);
+      padding: 20px 16px 8px;
+    }
+
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      cursor: pointer;
+      border-radius: 0;
+      transition: all 0.2s ease;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text2);
+      border-left: 3px solid transparent;
+    }
+
+    .sidebar-item:hover { background: var(--surface2); color: var(--text); }
+    .sidebar-item.active { background: rgba(192, 57, 43, 0.1); color: var(--red-light); border-left-color: var(--red); }
+
+    .sidebar-item svg { flex-shrink: 0; opacity: 0.7; }
+    .sidebar-item.active svg { opacity: 1; }
+
+    /* ===== CONTENT AREA ===== */
+    .admin-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 32px;
+      background: var(--bg);
+    }
+
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
+
+    .pane-header {
+      margin-bottom: 28px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .pane-header h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .pane-header p { font-size: 13px; color: var(--text2); }
+
+    /* ===== FORM ===== */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .form-grid.one { grid-template-columns: 1fr; }
+    .form-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group.full { grid-column: 1 / -1; }
+
+    label {
+      font-family: 'Outfit', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text2);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    input[type="text"],
+    input[type="url"],
+    input[type="tel"],
+    input[type="number"],
+    textarea,
+    select {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      padding: 10px 14px;
+      transition: border-color 0.2s ease;
+      outline: none;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(192,57,43,0.1);
+    }
+
+    textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
+
+    .input-hint {
+      font-size: 11px;
+      color: var(--text2);
+    }
+
+    /* ===== CARD BLOCK ===== */
+    .edit-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    .edit-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .edit-card-header h3 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-badge {
+      background: rgba(192,57,43,0.15);
+      color: var(--red-light);
+      font-size: 11px;
+      font-weight: 700;
+      font-family: 'Outfit', sans-serif;
+      padding: 3px 8px;
+      border-radius: 50px;
+    }
+
+    /* ===== FEATURE LIST ===== */
+    .feature-inputs { display: flex; flex-direction: column; gap: 8px; }
+    .feature-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .feature-row input { flex: 1; }
+    .feature-row .remove-feat {
+      width: 30px; height: 30px;
+      background: rgba(192,57,43,0.1);
+      border: 1px solid rgba(192,57,43,0.2);
+      border-radius: 6px;
+      color: var(--red-light);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; line-height: 1;
+      flex-shrink: 0;
+      transition: all 0.2s ease;
+    }
+    .feature-row .remove-feat:hover { background: var(--red); color: white; }
+
+    /* ===== STATUS BAR ===== */
+    .status-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 36px;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      gap: 16px;
+      z-index: 200;
+    }
+
+    .status-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+    }
+
+    .status-text {
+      font-size: 12px;
+      color: var(--text2);
+    }
+
+    .status-saved { color: var(--green); font-weight: 600; }
+    .status-unsaved { color: #e67e22; font-weight: 600; }
+
+    /* ===== TOAST ===== */
+    .toast {
+      position: fixed;
+      top: 80px;
+      right: 24px;
+      background: var(--green);
+      color: white;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 12px 20px;
+      border-radius: 8px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      transform: translateX(120%);
+      transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .toast.show { transform: translateX(0); }
+    .toast.error { background: var(--red); }
+
+    /* ===== YOUTUBE PREVIEW ===== */
+    .yt-preview {
+      width: 80px;
+      height: 45px;
+      object-fit: cover;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+    }
+
+    .yt-thumb-wrap { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+
+    /* ===== DIVIDER ===== */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 8px 0 20px;
+    }
+
+    /* ===== ACTIONS ROW ===== */
+    .section-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ===== SCROLLBAR ===== */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #444; }
+  </style>
+</head>
+<body>
+
+<!-- ===== LOGIN OVERLAY ===== -->
+<div id="login-overlay">
+  <div class="login-box" id="login-box">
+    <div class="login-logo">
+      <div class="login-logo-dot"></div>
+      <div class="login-logo-text">
+        <h2>Joglo Sablon</h2>
+        <span>Kaos Blitar — Admin</span>
+      </div>
+    </div>
+    <div class="login-title">Masuk ke Panel</div>
+    <p class="login-subtitle">Halaman ini hanya untuk admin. Masukkan password untuk melanjutkan.</p>
+
+    <div id="login-error" class="login-error">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span id="login-error-msg">Password salah. Coba lagi.</span>
+    </div>
+
+    <div class="login-field">
+      <label>Password Admin</label>
+      <input type="password" id="login-pass" placeholder="Masukkan password..." autocomplete="current-password" onkeydown="if(event.key==='Enter') doLogin()" />
+      <button class="eye-toggle" onclick="toggleEye()" title="Tampilkan/sembunyikan password" type="button">
+        <svg id="eye-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+          <circle cx="12" cy="12" r="3"/>
+        </svg>
+      </button>
+    </div>
+
+    <button class="login-btn" id="login-btn" onclick="doLogin()">
+      🔐 Masuk ke Admin Panel
+    </button>
+
+    <div class="login-footer">Halaman ini tidak terindeks oleh mesin pencari</div>
+  </div>
+</div>
+
+<!-- ===== ADMIN PANEL ===== -->
+<div id="admin-panel">
+
+<!-- ===== HEADER ===== -->
+<header class="admin-header">
+  <div class="admin-header-brand">
+    <div class="logo-dot"></div>
+    <div>
+      <h1>Admin Panel</h1>
+      <span>Joglo Sablon Kaos Blitar</span>
+    </div>
+  </div>
+  <div class="header-actions">
+    <button class="btn btn-ghost" onclick="resetAll()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+      Reset
+    </button>
+    <button class="btn btn-blue" onclick="openPreview()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15,3 21,3 21,9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      Preview Web
+    </button>
+    <button class="btn btn-green" onclick="saveAll()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>
+      Simpan Semua
+    </button>
+    <button class="btn btn-logout" onclick="doLogout()" title="Keluar dari admin">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16,17 21,12 16,7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Keluar
+    </button>
+  </div>
+</header>
+
+<!-- ===== BODY ===== -->
+<div class="admin-body">
+
+  <!-- SIDEBAR -->
+  <nav class="admin-sidebar">
+    <div class="sidebar-section-label">Konten Utama</div>
+
+    <div class="sidebar-item active" onclick="showTab('bisnis', this)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+      Info Bisnis
+    </div>
+    <div class="sidebar-item" onclick="showTab('hero', this)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+      Hero Section
+    </div>
+    <div class="sidebar-item" onclick="showTab('layanan', this)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      Layanan (4 Kartu)
+    </div>
+    <div class="sidebar-item" onclick="showTab('produk', this)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg>
+      Galeri Foto
+    </div>
+
+    <div class="sidebar-section-label">Media &amp; Sosial</div>
+
+    <div class="sidebar-item" onclick="showTab('video', this)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23,7 16,12 23,17"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+      Galeri Video
+    </div>
+    <div class="sidebar-item" onclick="showTab('testimoni', this)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      Testimoni
+    </div>
+
+    <div class="sidebar-section-label">Pengaturan</div>
+
+    <div class="sidebar-item" onclick="showTab('kontak', this)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+      Kontak &amp; Lokasi
+    </div>
+    <div class="sidebar-item" onclick="showTab('backup', this)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Backup &amp; Import
+    </div>
+  </nav>
+
+  <!-- CONTENT -->
+  <main class="admin-content" style="padding-bottom: 60px;">
+
+    <!-- ===== TAB: BISNIS ===== -->
+    <div class="tab-pane active" id="tab-bisnis">
+      <div class="pane-header">
+        <h2>🏠 Info Bisnis</h2>
+        <p>Nama usaha, kontak, jam buka, dan informasi dasar lainnya</p>
+      </div>
+      <div class="edit-card">
+        <div class="form-grid">
+          <div class="form-group full">
+            <label>Nama Usaha</label>
+            <input type="text" id="b-nama" placeholder="JOGLO SABLON KAOS BLITAR" />
+          </div>
+          <div class="form-group full">
+            <label>Tagline / Slogan</label>
+            <input type="text" id="b-tagline" placeholder="Sablon Kaos Berkualitas Tinggi dengan Harga Terjangkau" />
+          </div>
+          <div class="form-group">
+            <label>Nomor WhatsApp (format: 628xxx)</label>
+            <input type="tel" id="b-wa" placeholder="6282228106342" />
+            <span class="input-hint">Tanpa + di depan. Contoh: 628222xxxxxxx</span>
+          </div>
+          <div class="form-group">
+            <label>Nomor Telepon (tampilan)</label>
+            <input type="text" id="b-telp" placeholder="0822-2810-6342" />
+          </div>
+          <div class="form-group">
+            <label>Rating Google</label>
+            <input type="text" id="b-rating" placeholder="4.9" />
+          </div>
+          <div class="form-group">
+            <label>Jumlah Ulasan (tampilan)</label>
+            <input type="text" id="b-ulasan" placeholder="156+" />
+          </div>
+          <div class="form-group">
+            <label>Jumlah Pelanggan (angka untuk counter)</label>
+            <input type="number" id="b-pelanggan" placeholder="156" />
+          </div>
+          <div class="form-group">
+            <label>Tahun Pengalaman (angka untuk counter)</label>
+            <input type="number" id="b-tahun" placeholder="5" />
+          </div>
+        </div>
+      </div>
+
+      <div class="edit-card">
+        <div class="edit-card-header"><h3>📍 Jam Operasional</h3></div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Hari Buka</label>
+            <input type="text" id="b-hari" placeholder="Senin – Sabtu" />
+          </div>
+          <div class="form-group">
+            <label>Jam Buka</label>
+            <input type="text" id="b-jam" placeholder="08.00 – 17.00 WIB" />
+          </div>
+          <div class="form-group">
+            <label>Hari Tutup</label>
+            <input type="text" id="b-tutup-hari" placeholder="Minggu" />
+          </div>
+          <div class="form-group">
+            <label>Keterangan Hari Tutup</label>
+            <input type="text" id="b-tutup-ket" placeholder="Tutup" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== TAB: HERO ===== -->
+    <div class="tab-pane" id="tab-hero">
+      <div class="pane-header">
+        <h2>🎯 Hero Section</h2>
+        <p>Judul utama, deskripsi, dan badge di bagian paling atas halaman</p>
+      </div>
+      <div class="edit-card">
+        <div class="form-grid">
+          <div class="form-group full">
+            <label>Teks Badge Atas</label>
+            <input type="text" id="h-badge" placeholder="4.9 Rating · 156+ Pelanggan Puas" />
+          </div>
+          <div class="form-group">
+            <label>Judul Baris 1</label>
+            <input type="text" id="h-judul1" placeholder="Sablon Kaos" />
+          </div>
+          <div class="form-group">
+            <label>Judul Baris 2 (merah/aksen)</label>
+            <input type="text" id="h-judul2" placeholder="Berkualitas Tinggi" />
+          </div>
+          <div class="form-group full">
+            <label>Judul Baris 3</label>
+            <input type="text" id="h-judul3" placeholder="Harga Terjangkau" />
+          </div>
+          <div class="form-group full">
+            <label>Deskripsi Hero</label>
+            <textarea id="h-desc" placeholder="Joglo Sablon Kaos Blitar — Pilihan terbaik untuk sablon kaos custom..."></textarea>
+          </div>
+          <div class="form-group">
+            <label>Teks Tombol Utama</label>
+            <input type="text" id="h-btn1" placeholder="Konsultasi Gratis via WA" />
+          </div>
+          <div class="form-group">
+            <label>Teks Tombol Kedua</label>
+            <input type="text" id="h-btn2" placeholder="Lihat Produk" />
+          </div>
+        </div>
+      </div>
+
+      <div class="edit-card">
+        <div class="edit-card-header"><h3>📌 Judul Section Lainnya</h3></div>
+        <div class="form-grid">
+          <div class="form-group"><label>Judul Section Layanan</label><input type="text" id="h-sec-layanan" placeholder="Apa yang Kami Tawarkan?" /></div>
+          <div class="form-group"><label>Judul Section Produk</label><input type="text" id="h-sec-produk" placeholder="Hasil Karya Terbaik Kami" /></div>
+          <div class="form-group"><label>Judul Section Video</label><input type="text" id="h-sec-video" placeholder="Lihat Proses &amp; Hasil Kami" /></div>
+          <div class="form-group"><label>Judul Section Testimoni</label><input type="text" id="h-sec-testi" placeholder="Apa Kata Pelanggan Kami?" /></div>
+          <div class="form-group"><label>Judul Section Kontak</label><input type="text" id="h-sec-kontak" placeholder="Kunjungi atau Hubungi Kami" /></div>
+          <div class="form-group"><label>Judul Section CTA</label><input type="text" id="h-sec-cta" placeholder="Siap Memesan Kaos Custom?" /></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== TAB: LAYANAN ===== -->
+    <div class="tab-pane" id="tab-layanan">
+      <div class="pane-header">
+        <h2>📦 Layanan (4 Kartu)</h2>
+        <p>Edit judul, deskripsi, dan fitur untuk setiap kartu layanan</p>
+      </div>
+      <div id="layanan-container"></div>
+    </div>
+
+    <!-- ===== TAB: PRODUK ===== -->
+    <div class="tab-pane" id="tab-produk">
+      <div class="pane-header">
+        <h2>🖼️ Galeri Foto</h2>
+        <p>Edit judul, deskripsi, dan path gambar untuk setiap foto produk</p>
+      </div>
+      <div id="produk-container"></div>
+    </div>
+
+    <!-- ===== TAB: VIDEO ===== -->
+    <div class="tab-pane" id="tab-video">
+      <div class="pane-header">
+        <h2>📹 Galeri Video</h2>
+        <p>Edit judul, deskripsi, dan YouTube Video ID untuk setiap video</p>
+      </div>
+      <div id="video-container"></div>
+    </div>
+
+    <!-- ===== TAB: TESTIMONI ===== -->
+    <div class="tab-pane" id="tab-testimoni">
+      <div class="pane-header">
+        <h2>💬 Testimoni Pelanggan</h2>
+        <p>Edit nama, teks ulasan, dan waktu untuk setiap testimoni</p>
+      </div>
+      <div id="testi-container"></div>
+    </div>
+
+    <!-- ===== TAB: KONTAK ===== -->
+    <div class="tab-pane" id="tab-kontak">
+      <div class="pane-header">
+        <h2>📍 Kontak &amp; Lokasi</h2>
+        <p>Alamat lengkap, link Google Maps, dan info kontak di halaman website</p>
+      </div>
+      <div class="edit-card">
+        <div class="form-grid">
+          <div class="form-group full">
+            <label>Alamat Lengkap</label>
+            <textarea id="k-alamat" placeholder="Krajan, RT.05/RW.02, Pagerwojo,&#10;Kec. Kesamben, Kab. Blitar,&#10;Jawa Timur 66191"></textarea>
+          </div>
+          <div class="form-group full">
+            <label>Alamat Singkat (footer)</label>
+            <input type="text" id="k-alamat-short" placeholder="Pagerwojo, Kesamben, Blitar" />
+          </div>
+          <div class="form-group full">
+            <label>URL Google Maps</label>
+            <input type="url" id="k-maps-url" placeholder="https://maps.app.goo.gl/FSXDZz4GfMKWVBzt6" />
+          </div>
+          <div class="form-group full">
+            <label>Google Maps Embed URL (iframe src)</label>
+            <input type="url" id="k-maps-embed" placeholder="https://www.google.com/maps/embed?pb=..." />
+            <span class="input-hint">Dapatkan dari Google Maps → Share → Embed a map → salin URL pada src="..."</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== TAB: BACKUP ===== -->
+    <div class="tab-pane" id="tab-backup">
+      <div class="pane-header">
+        <h2>💾 Backup &amp; Import</h2>
+        <p>Ekspor semua pengaturan ke file JSON, atau muat ulang dari backup</p>
+      </div>
+      <div class="edit-card">
+        <div class="edit-card-header"><h3>📤 Export Data</h3></div>
+        <p style="font-size:13px;color:var(--text2);margin-bottom:16px;">Unduh semua konten website sebagai file JSON untuk backup atau dipindah ke perangkat lain.</p>
+        <button class="btn btn-green" onclick="exportJSON()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download Backup JSON
+        </button>
+      </div>
+      <div class="edit-card" style="margin-top:20px;">
+        <div class="edit-card-header"><h3>📥 Import Data</h3></div>
+        <p style="font-size:13px;color:var(--text2);margin-bottom:16px;">Muat data dari file JSON backup yang sebelumnya diunduh.</p>
+        <input type="file" id="import-file" accept=".json" style="display:none" onchange="importJSON(event)" />
+        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+          <button class="btn btn-blue" onclick="document.getElementById('import-file').click()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Pilih File JSON
+          </button>
+          <button class="btn btn-ghost" onclick="resetAll()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            Reset ke Default
+          </button>
+        </div>
+      </div>
+      <div class="edit-card" style="margin-top:20px;">
+        <div class="edit-card-header"><h3>📋 Data Tersimpan (JSON Raw)</h3></div>
+        <textarea id="raw-json" style="min-height:200px;font-family:monospace;font-size:11px;background:#0D0D0D;" readonly></textarea>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- STATUS BAR -->
+<div class="status-bar">
+  <div class="status-dot" id="status-dot"></div>
+  <span class="status-text" id="status-text">Memuat data...</span>
+  <span style="margin-left:auto;font-size:11px;color:var(--text2);">Perubahan disimpan ke localStorage · Reload halaman utama untuk melihat</span>
+</div>
+
+</div><!-- end #admin-panel -->
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20,6 9,17 4,12"/></svg>
+  <span id="toast-msg">Tersimpan!</span>
+</div>
+
+<script>
+// =============================
+// AUTH — SESSION CHECK
+// =============================
+(function () {
+  // Kunci sesi disimpan di sessionStorage (hilang saat tab ditutup)
+  var _sk = 'jsl_s';
+  // Hash sederhana untuk menyembunyikan password di source code
+  function _h(s) {
+    var h = 0, i, c;
+    for (i = 0; i < s.length; i++) {
+      c = s.charCodeAt(i);
+      h = ((h << 5) - h) + c;
+      h |= 0;
+    }
+    return h.toString(16);
+  }
+  // Hash dari password "adminjsp2019"
+  var _ph = _h('adminjsp2019');
+  window._authCheck = function (input) {
+    return _h(input) === _ph;
+  };
+  window._sessionKey = _sk;
+  // Cek apakah sudah login di sesi ini
+  if (sessionStorage.getItem(_sk) === _ph) {
+    document.getElementById('login-overlay').style.display = 'none';
+    document.getElementById('admin-panel').classList.add('visible');
+  }
+})();
+
+// =============================
+// LOGIN LOGIC
+// =============================
+var _failCount = 0;
+var _lockUntil = 0;
+
+function doLogin() {
+  var now = Date.now();
+  if (now < _lockUntil) {
+    var wait = Math.ceil((_lockUntil - now) / 1000);
+    showLoginError('Terlalu banyak percobaan. Tunggu ' + wait + ' detik.');
+    return;
+  }
+
+  var pass = document.getElementById('login-pass').value;
+  if (!pass) {
+    showLoginError('Password tidak boleh kosong.');
+    shakeBox();
+    return;
+  }
+
+  if (window._authCheck(pass)) {
+    // Login berhasil
+    _failCount = 0;
+    sessionStorage.setItem(window._sessionKey, (function(s){
+      var h=0,i,c;for(i=0;i<s.length;i++){c=s.charCodeAt(i);h=((h<<5)-h)+c;h|=0;}return h.toString(16);
+    })('adminjsp2019'));
+    document.getElementById('login-overlay').style.transition = 'opacity 0.4s ease';
+    document.getElementById('login-overlay').style.opacity = '0';
+    setTimeout(function () {
+      document.getElementById('login-overlay').style.display = 'none';
+      document.getElementById('admin-panel').classList.add('visible');
+      loadData();
+    }, 400);
+  } else {
+    // Login gagal
+    _failCount++;
+    shakeBox();
+    if (_failCount >= 5) {
+      _lockUntil = Date.now() + 30000; // Kunci 30 detik
+      showLoginError('Terlalu banyak percobaan. Tunggu 30 detik.');
+      _failCount = 0;
+    } else {
+      showLoginError('Password salah. Percobaan ke-' + _failCount + ' dari 5.');
+    }
+    document.getElementById('login-pass').value = '';
+    document.getElementById('login-pass').focus();
+  }
+}
+
+function doLogout() {
+  if (!confirm('Yakin ingin keluar dari Admin Panel?')) return;
+  sessionStorage.removeItem(window._sessionKey);
+  document.getElementById('admin-panel').classList.remove('visible');
+  document.getElementById('login-overlay').style.opacity = '1';
+  document.getElementById('login-overlay').style.display = 'flex';
+  document.getElementById('login-pass').value = '';
+  hideLoginError();
+}
+
+function showLoginError(msg) {
+  var el = document.getElementById('login-error');
+  document.getElementById('login-error-msg').textContent = msg;
+  el.classList.add('show');
+}
+
+function hideLoginError() {
+  document.getElementById('login-error').classList.remove('show');
+}
+
+function shakeBox() {
+  var box = document.getElementById('login-box');
+  box.classList.remove('login-shake');
+  void box.offsetWidth; // force reflow
+  box.classList.add('login-shake');
+}
+
+function toggleEye() {
+  var inp = document.getElementById('login-pass');
+  var icon = document.getElementById('eye-icon');
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+  } else {
+    inp.type = 'password';
+    icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+  }
+}
+
+// =============================
+// DEFAULT DATA
+// =============================
+const DEFAULTS = {
+  bisnis: {
+    nama: 'JOGLO SABLON KAOS BLITAR',
+    tagline: 'Sablon Kaos Berkualitas Tinggi dengan Harga Terjangkau. Melayani Online & Offline seluruh Indonesia.',
+    wa: '6282228106342',
+    telp: '0822-2810-6342',
+    rating: '4.9',
+    ulasan: '156+',
+    pelanggan: 156,
+    tahun: 5,
+    hari: 'Senin – Sabtu',
+    jam: '08.00 – 17.00 WIB',
+    tutup_hari: 'Minggu',
+    tutup_ket: 'Tutup'
+  },
+  hero: {
+    badge: '4.9 Rating · 156+ Pelanggan Puas',
+    judul1: 'Sablon Kaos',
+    judul2: 'Berkualitas Tinggi',
+    judul3: 'Harga Terjangkau',
+    desc: 'Joglo Sablon Kaos Blitar — Pilihan terbaik untuk sablon kaos custom berkualitas premium. Cocok untuk seragam kerja, kaos komunitas, merchandise event, dan kebutuhan personal.',
+    btn1: 'Konsultasi Gratis via WA',
+    btn2: 'Lihat Produk',
+    sec_layanan: 'Apa yang Kami Tawarkan?',
+    sec_produk: 'Hasil Karya Terbaik Kami',
+    sec_video: 'Lihat Proses & Hasil Kami',
+    sec_testi: 'Apa Kata Pelanggan Kami?',
+    sec_kontak: 'Kunjungi atau Hubungi Kami',
+    sec_cta: 'Siap Memesan Kaos Custom?'
+  },
+  layanan: [
+    { judul: 'Sablon Manual', deskripsi: 'Teknik sablon screen printing tradisional dengan hasil warna yang tajam, tahan lama, dan berkualitas tinggi. Cocok untuk design bold dan kaos dalam jumlah besar.', fitur: ['Warna Tajam & Tahan Lama', 'Cocok Pesanan Massal', 'Berbagai Jenis Tinta'], popular: false },
+    { judul: 'Sablon DTF', deskripsi: 'Direct To Film (DTF) printing dengan teknologi modern untuk detail gambar yang sempurna. Ideal untuk design warna-warni dan pesanan satuan maupun grosir.', fitur: ['Detail Gambar Presisi Tinggi', 'Bisa Pesanan Satuan', 'Full Color Tanpa Batas'], popular: true },
+    { judul: 'Kaos Custom', deskripsi: 'Layanan pembuatan kaos dari awal hingga akhir — mulai desain, pemilihan bahan, sablon, hingga packaging. Cocok untuk merchandise, seragam, atau kebutuhan khusus.', fitur: ['Desain Bantu Tim Kami', 'Bahan Pilihan Terbaik', 'Packaging Profesional'], popular: false },
+    { judul: 'Konveksi Kaos', deskripsi: 'Layanan konveksi lengkap untuk kebutuhan produksi massal. Tersedia berbagai pilihan bahan dan model kaos dengan harga yang kompetitif untuk pemesanan grosir.', fitur: ['Minimum Order Fleksibel', 'Harga Spesial Grosir', 'Pengiriman ke Seluruh Indonesia'], popular: false }
+  ],
+  produk: [
+    { judul: 'Kaos Custom Full Color', desc: 'DTF / Sablon Berkualitas', tag: 'Koleksi Premium', img: 'images/product_showcase.png' },
+    { judul: 'Proses Sablon Profesional', desc: 'Dikerjakan dengan Mesin Modern', tag: 'Workshop', img: 'images/printing_process.png' },
+    { judul: 'Berbagai Pilihan Desain', desc: 'Sesuai Keinginan Anda', tag: 'Custom Design', img: 'images/custom_tshirt_designs.png' }
+  ],
+  video: [
+    { judul: 'Proses Sablon Screen Printing', desc: 'Teknik sablon manual yang menghasilkan warna tajam dan tahan lama', label: 'Sablon Manual', yt_id: 'Y7eSvQx3t5s' },
+    { judul: 'Teknologi DTF Printing', desc: 'Full color detail tinggi untuk desain kompleks dan foto', label: 'Sablon DTF', yt_id: 'RHlZhRTRRpQ' },
+    { judul: 'Hasil Kaos Custom Berkualitas', desc: 'Review hasil akhir sablon premium yang memuaskan pelanggan', label: 'Kaos Custom', yt_id: 'KpkBCMYH5dY' },
+    { judul: 'Behind The Scenes Workshop', desc: 'Intip langsung kesibukan di workshop produksi kami', label: 'Behind The Scenes', yt_id: '4BJfQ4yHJeI' }
+  ],
+  testimoni: [
+    { nama: 'Pak Didit', initial: 'PD', warna: '#C0392B', teks: 'Sudah berlangganan dan pernah beberapa kali memesan kaos di Joglo. Hasilnya sangat memuaskan, dengan harga yang terjangkau dan ramah di kantong. Kualitasnya benar-benar TOP!', waktu: 'Pelanggan Setia · 4 bulan lalu' },
+    { nama: 'Wahyy Saputra', initial: 'WS', warna: '#2980b9', teks: 'Tempat sablon berkualitas, bukan sembarangan, harga terjangkau, banyak diskon, pengerjaan cepat, pelayanan ramah, respon cepat. Kalau mau sablon di sini, kualitasnya sudah jelas!', waktu: 'Pelanggan · 5 bulan lalu' },
+    { nama: 'Nikeafelia', initial: 'NA', warna: '#8e44ad', teks: 'Kualitas kaosnya bagus, harganya bervariasi tapi cukup kompetitif untuk kualitas yang ditawarkan, dan sering ada diskon atau harga spesial untuk pembelian dalam jumlah banyak 🥰', waktu: 'Pelanggan · 5 bulan lalu' },
+    { nama: 'Reza Fata', initial: 'RF', warna: '#27ae60', teks: 'Bagi saya ini tempat yang benar-benar direkomendasikan... Soal bahan... Harganya... Dan kualitasnya cukup memuaskan... Dan pelayanannya sangat ramah.', waktu: 'Pelanggan · 5 bulan lalu' },
+    { nama: 'Ratna Evi', initial: 'RE', warna: '#e67e22', teks: 'Pelayanan bagus, penampilan menarik. Sangat puas dengan hasil sablon yang diberikan. Recommended banget untuk teman-teman yang ingin sablon kaos berkualitas!', waktu: 'Pelanggan · 10 bulan lalu' }
+  ],
+  kontak: {
+    alamat: 'Krajan, RT.05/RW.02, Pagerwojo,\nKec. Kesamben, Kab. Blitar,\nJawa Timur 66191',
+    alamat_short: 'Pagerwojo, Kesamben, Blitar',
+    maps_url: 'https://maps.app.goo.gl/FSXDZz4GfMKWVBzt6',
+    maps_embed: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3949.6566572299935!2d112.3735724!3d-8.1363925!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e7891e794d91d55%3A0xe0bb17e94b89bee0!2sJOGLO%20SABLON%20KAOS%20BLITAR!5e0!3m2!1sid!2sid!4v1700000000000!5m2!1sid!2sid'
+  }
+};
+
+let data = {};
+let isDirty = false;
+
+// =============================
+// LOAD / SAVE
+// =============================
+function loadData() {
+  const saved = localStorage.getItem('joglo-content');
+  data = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(DEFAULTS));
+  fillForms();
+  updateStatus(false);
+}
+
+function saveAll() {
+  collectForms();
+  localStorage.setItem('joglo-content', JSON.stringify(data));
+  if (webTab && !webTab.closed) {
+    try { webTab.location.reload(); } catch(e) {}
+  }
+  updateStatus(false);
+  showToast('✅ Tersimpan! Halaman web diperbarui.');
+  const rawEl = document.getElementById('raw-json');
+  if (rawEl) rawEl.value = JSON.stringify(data, null, 2);
+}
+
+function resetAll() {
+  if (!confirm('Reset semua ke data default? Perubahan yang belum disimpan akan hilang.')) return;
+  localStorage.removeItem('joglo-content');
+  data = JSON.parse(JSON.stringify(DEFAULTS));
+  fillForms();
+  updateStatus(false);
+  showToast('🔄 Data direset ke default');
+}
+
+let webTab = null;
+function openPreview() {
+  saveAll();
+  if (webTab && !webTab.closed) {
+    webTab.location.reload();
+    webTab.focus();
+  } else {
+    webTab = window.open('index.html', 'joglo-preview');
+  }
+}
+
+// =============================
+// FILL FORMS FROM DATA
+// =============================
+function fillForms() {
+  // Bisnis
+  const b = data.bisnis;
+  setVal('b-nama', b.nama); setVal('b-tagline', b.tagline);
+  setVal('b-wa', b.wa); setVal('b-telp', b.telp);
+  setVal('b-rating', b.rating); setVal('b-ulasan', b.ulasan);
+  setVal('b-pelanggan', b.pelanggan); setVal('b-tahun', b.tahun);
+  setVal('b-hari', b.hari); setVal('b-jam', b.jam);
+  setVal('b-tutup-hari', b.tutup_hari); setVal('b-tutup-ket', b.tutup_ket);
+
+  // Hero
+  const h = data.hero;
+  setVal('h-badge', h.badge); setVal('h-judul1', h.judul1);
+  setVal('h-judul2', h.judul2); setVal('h-judul3', h.judul3);
+  setVal('h-desc', h.desc); setVal('h-btn1', h.btn1); setVal('h-btn2', h.btn2);
+  setVal('h-sec-layanan', h.sec_layanan); setVal('h-sec-produk', h.sec_produk);
+  setVal('h-sec-video', h.sec_video); setVal('h-sec-testi', h.sec_testi);
+  setVal('h-sec-kontak', h.sec_kontak); setVal('h-sec-cta', h.sec_cta);
+
+  // Kontak
+  const k = data.kontak;
+  setVal('k-alamat', k.alamat); setVal('k-alamat-short', k.alamat_short);
+  setVal('k-maps-url', k.maps_url); setVal('k-maps-embed', k.maps_embed);
+
+  // Dynamic sections
+  renderLayanan();
+  renderProduk();
+  renderVideo();
+  renderTestimoni();
+
+  // Raw JSON
+  const rawEl = document.getElementById('raw-json');
+  if (rawEl) rawEl.value = JSON.stringify(data, null, 2);
+}
+
+function setVal(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.value = val ?? '';
+}
+
+// =============================
+// COLLECT FORMS INTO DATA
+// =============================
+function collectForms() {
+  data.bisnis = {
+    nama: getVal('b-nama'), tagline: getVal('b-tagline'),
+    wa: getVal('b-wa'), telp: getVal('b-telp'),
+    rating: getVal('b-rating'), ulasan: getVal('b-ulasan'),
+    pelanggan: parseInt(getVal('b-pelanggan')) || 0,
+    tahun: parseInt(getVal('b-tahun')) || 0,
+    hari: getVal('b-hari'), jam: getVal('b-jam'),
+    tutup_hari: getVal('b-tutup-hari'), tutup_ket: getVal('b-tutup-ket')
+  };
+  data.hero = {
+    badge: getVal('h-badge'), judul1: getVal('h-judul1'),
+    judul2: getVal('h-judul2'), judul3: getVal('h-judul3'),
+    desc: getVal('h-desc'), btn1: getVal('h-btn1'), btn2: getVal('h-btn2'),
+    sec_layanan: getVal('h-sec-layanan'), sec_produk: getVal('h-sec-produk'),
+    sec_video: getVal('h-sec-video'), sec_testi: getVal('h-sec-testi'),
+    sec_kontak: getVal('h-sec-kontak'), sec_cta: getVal('h-sec-cta')
+  };
+  data.kontak = {
+    alamat: getVal('k-alamat'), alamat_short: getVal('k-alamat-short'),
+    maps_url: getVal('k-maps-url'), maps_embed: getVal('k-maps-embed')
+  };
+
+  // Layanan
+  data.layanan = data.layanan.map((_, i) => ({
+    judul: getVal(`l-judul-${i}`),
+    deskripsi: getVal(`l-desc-${i}`),
+    popular: document.getElementById(`l-popular-${i}`)?.checked || false,
+    fitur: [getVal(`l-f0-${i}`), getVal(`l-f1-${i}`), getVal(`l-f2-${i}`)].filter(Boolean)
+  }));
+
+  // Produk
+  data.produk = data.produk.map((_, i) => ({
+    judul: getVal(`p-judul-${i}`), desc: getVal(`p-desc-${i}`),
+    tag: getVal(`p-tag-${i}`), img: getVal(`p-img-${i}`)
+  }));
+
+  // Video
+  data.video = data.video.map((_, i) => ({
+    judul: getVal(`v-judul-${i}`), desc: getVal(`v-desc-${i}`),
+    label: getVal(`v-label-${i}`), yt_id: getVal(`v-ytid-${i}`)
+  }));
+
+  // Testimoni
+  data.testimoni = data.testimoni.map((_, i) => ({
+    nama: getVal(`t-nama-${i}`), initial: getVal(`t-init-${i}`),
+    warna: getVal(`t-warna-${i}`),
+    teks: getVal(`t-teks-${i}`), waktu: getVal(`t-waktu-${i}`)
+  }));
+}
+
+function getVal(id) {
+  return (document.getElementById(id)?.value || '').trim();
+}
+
+// =============================
+// RENDER DYNAMIC SECTIONS
+// =============================
+function renderLayanan() {
+  const cont = document.getElementById('layanan-container');
+  cont.innerHTML = data.layanan.map((l, i) => `
+    <div class="edit-card">
+      <div class="edit-card-header">
+        <h3>Kartu ${i + 1} <span class="card-badge">${l.popular ? '⭐ Populer' : `Layanan ${i+1}`}</span></h3>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Judul Layanan</label>
+          <input type="text" id="l-judul-${i}" value="${esc(l.judul)}" />
+        </div>
+        <div class="form-group" style="align-items:flex-end;">
+          <label style="margin-bottom:10px;">
+            <input type="checkbox" id="l-popular-${i}" ${l.popular ? 'checked' : ''} style="margin-right:6px;accent-color:var(--red);" />
+            Tampilkan sebagai Populer
+          </label>
+        </div>
+        <div class="form-group full">
+          <label>Deskripsi</label>
+          <textarea id="l-desc-${i}">${esc(l.deskripsi)}</textarea>
+        </div>
+        <div class="form-group full">
+          <label>Fitur (3 poin)</label>
+          <div class="feature-inputs">
+            ${(l.fitur || ['','','']).slice(0,3).map((f, fi) => `
+              <div class="feature-row">
+                <input type="text" id="l-f${fi}-${i}" value="${esc(f)}" placeholder="Fitur ${fi+1}..." />
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderProduk() {
+  const cont = document.getElementById('produk-container');
+  cont.innerHTML = data.produk.map((p, i) => `
+    <div class="edit-card">
+      <div class="edit-card-header">
+        <h3>Foto ${i + 1} <span class="card-badge">${p.tag}</span></h3>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Judul</label>
+          <input type="text" id="p-judul-${i}" value="${esc(p.judul)}" />
+        </div>
+        <div class="form-group">
+          <label>Sub-judul / Deskripsi</label>
+          <input type="text" id="p-desc-${i}" value="${esc(p.desc)}" />
+        </div>
+        <div class="form-group">
+          <label>Label Tag (misal: Koleksi Premium)</label>
+          <input type="text" id="p-tag-${i}" value="${esc(p.tag)}" />
+        </div>
+        <div class="form-group">
+          <label>Path Gambar</label>
+          <input type="text" id="p-img-${i}" value="${esc(p.img)}" placeholder="images/nama-file.png" />
+          <span class="input-hint">Relative path dari folder website</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderVideo() {
+  const cont = document.getElementById('video-container');
+  cont.innerHTML = data.video.map((v, i) => `
+    <div class="edit-card">
+      <div class="edit-card-header">
+        <h3>Video ${i + 1} <span class="card-badge">${v.label}</span></h3>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Judul Video</label>
+          <input type="text" id="v-judul-${i}" value="${esc(v.judul)}" />
+        </div>
+        <div class="form-group">
+          <label>Label Badge (misal: Sablon DTF)</label>
+          <input type="text" id="v-label-${i}" value="${esc(v.label)}" />
+        </div>
+        <div class="form-group full">
+          <label>Deskripsi Singkat</label>
+          <input type="text" id="v-desc-${i}" value="${esc(v.desc)}" />
+        </div>
+        <div class="form-group">
+          <label>YouTube Video ID</label>
+          <input type="text" id="v-ytid-${i}" value="${esc(v.yt_id)}" placeholder="contoh: Y7eSvQx3t5s" oninput="updateThumb(${i})" />
+          <span class="input-hint">Dari URL: youtube.com/watch?v=<strong>VIDEO_ID_DI_SINI</strong></span>
+        </div>
+        <div class="form-group">
+          <label>Preview Thumbnail</label>
+          <div class="yt-thumb-wrap">
+            <img id="v-thumb-${i}" src="https://img.youtube.com/vi/${esc(v.yt_id)}/mqdefault.jpg" class="yt-preview" alt="thumb" />
+            <span style="font-size:11px;color:var(--text2);">Otomatis diambil dari YouTube</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderTestimoni() {
+  const cont = document.getElementById('testi-container');
+  cont.innerHTML = data.testimoni.map((t, i) => `
+    <div class="edit-card">
+      <div class="edit-card-header">
+        <h3>Testimoni ${i + 1} <span class="card-badge">${t.nama}</span></h3>
+      </div>
+      <div class="form-grid three">
+        <div class="form-group">
+          <label>Nama</label>
+          <input type="text" id="t-nama-${i}" value="${esc(t.nama)}" />
+        </div>
+        <div class="form-group">
+          <label>Inisial (2 huruf)</label>
+          <input type="text" id="t-init-${i}" value="${esc(t.initial)}" maxlength="2" />
+        </div>
+        <div class="form-group">
+          <label>Warna Avatar</label>
+          <input type="text" id="t-warna-${i}" value="${esc(t.warna)}" placeholder="#C0392B" style="font-family:monospace;" />
+        </div>
+      </div>
+      <div class="form-grid" style="margin-top:12px;">
+        <div class="form-group full">
+          <label>Teks Ulasan</label>
+          <textarea id="t-teks-${i}">${esc(t.teks)}</textarea>
+        </div>
+        <div class="form-group">
+          <label>Waktu (misal: 4 bulan lalu)</label>
+          <input type="text" id="t-waktu-${i}" value="${esc(t.waktu)}" />
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function updateThumb(i) {
+  const id = document.getElementById(`v-ytid-${i}`)?.value.trim();
+  const img = document.getElementById(`v-thumb-${i}`);
+  if (img && id) img.src = `https://img.youtube.com/vi/${id}/mqdefault.jpg`;
+}
+
+function esc(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// =============================
+// TAB NAVIGATION
+// =============================
+function showTab(name, el) {
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
+  document.getElementById('tab-' + name)?.classList.add('active');
+  el.classList.add('active');
+  if (name === 'backup') {
+    const rawEl = document.getElementById('raw-json');
+    if (rawEl) rawEl.value = JSON.stringify(data, null, 2);
+  }
+}
+
+// =============================
+// STATUS & TOAST
+// =============================
+function updateStatus(dirty) {
+  isDirty = dirty;
+  const dot = document.getElementById('status-dot');
+  const txt = document.getElementById('status-text');
+  if (dirty) {
+    dot.style.background = '#e67e22';
+    txt.innerHTML = '<span class="status-unsaved">● Ada perubahan belum tersimpan</span>';
+  } else {
+    dot.style.background = '#27AE60';
+    const now = new Date().toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' });
+    txt.innerHTML = `<span class="status-saved">● Tersimpan</span> &nbsp;·&nbsp; ${now}`;
+  }
+}
+
+let toastTimer;
+function showToast(msg, isError = false) {
+  const toast = document.getElementById('toast');
+  const msgEl = document.getElementById('toast-msg');
+  msgEl.textContent = msg;
+  toast.classList.toggle('error', isError);
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 2800);
+}
+
+// =============================
+// EXPORT / IMPORT
+// =============================
+function exportJSON() {
+  collectForms();
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'joglo-sablon-backup-' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  showToast('📦 File backup berhasil diunduh!');
+}
+
+function importJSON(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      data = JSON.parse(e.target.result);
+      fillForms();
+      saveAll();
+      showToast('✅ Data berhasil diimport!');
+    } catch {
+      showToast('❌ File JSON tidak valid!', true);
+    }
+  };
+  reader.readAsText(file);
+}
+
+// =============================
+// MARK DIRTY ON INPUT
+// =============================
+document.addEventListener('input', (e) => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+    if (!isDirty && document.getElementById('admin-panel').classList.contains('visible')) updateStatus(true);
+  }
+});
+
+// =============================
+// INIT — hanya load data jika sudah login
+// =============================
+document.addEventListener('DOMContentLoaded', () => {
+  const _sk = window._sessionKey;
+  function _h(s){var h=0,i,c;for(i=0;i<s.length;i++){c=s.charCodeAt(i);h=((h<<5)-h)+c;h|=0;}return h.toString(16);}
+  if (sessionStorage.getItem(_sk) === _h('adminjsp2019')) {
+    loadData();
+  } else {
+    // Auto-focus input password
+    setTimeout(() => document.getElementById('login-pass')?.focus(), 300);
+  }
+});
+</script>
+</body>
+</html>

@@ -34,6 +34,207 @@ if (themeToggleBtn) {
   });
 }
 
+// ===== APPLY CONTENT FROM ADMIN PANEL =====
+function applyContent() {
+  const raw = localStorage.getItem('joglo-content');
+  if (!raw) return;
+  let d;
+  try { d = JSON.parse(raw); } catch { return; }
+
+  // Helper: safe set text
+  const setText = (sel, val) => {
+    if (!val) return;
+    document.querySelectorAll(sel).forEach(el => el.textContent = val);
+  };
+  const setHtml = (sel, val) => {
+    if (!val) return;
+    document.querySelectorAll(sel).forEach(el => el.innerHTML = val);
+  };
+  const setAttr = (sel, attr, val) => {
+    if (!val) return;
+    document.querySelectorAll(sel).forEach(el => el.setAttribute(attr, val));
+  };
+  const buildWA = (wa, msg) => `https://wa.me/${wa}?text=${encodeURIComponent(msg)}`;
+
+  const b = d.bisnis || {};
+  const h = d.hero || {};
+  const k = d.kontak || {};
+
+  // ---- BISNIS ----
+  if (b.nama) {
+    setText('.logo-main', b.nama.split(' ').slice(0,2).join(' '));
+    setText('.logo-sub', b.nama.split(' ').slice(2).join(' ') || 'KAOS BLITAR');
+    setText('.footer-logo-main', b.nama.split(' ').slice(0,2).join(' '));
+    setText('.footer-logo-sub', b.nama.split(' ').slice(2).join(' ') || 'KAOS BLITAR');
+    document.title = b.nama + ' | Sablon Berkualitas, Harga Terjangkau';
+  }
+  if (b.tagline) setText('.footer-tagline', b.tagline);
+  if (b.telp) { setText('.footer-telp', b.telp); setText('#kontak-phone p', b.telp); }
+  if (b.rating) {
+    setText('.rating-number', b.rating);
+    document.querySelectorAll('.hero-badge').forEach(el => {
+      el.textContent = `${b.rating} Rating · ${b.ulasan || '156+'} Pelanggan Puas`;
+    });
+    setText('.footer-rating span', `${b.rating}/5 dari ${b.ulasan || '156+'} ulasan Google`);
+    setText('.rating-count', `${b.ulasan || '156+'} Ulasan Google`);
+  }
+  if (b.pelanggan) {
+    document.querySelectorAll('[data-target]').forEach(el => {
+      const label = el.nextElementSibling?.nextElementSibling?.textContent || '';
+      if (label.includes('Pelanggan')) el.setAttribute('data-target', b.pelanggan);
+      if (label.includes('Tahun') && b.tahun) el.setAttribute('data-target', b.tahun);
+    });
+  }
+  if (b.hari) setText('#kontak-jam .jam-row:first-child span:first-child', b.hari);
+  if (b.jam) setText('#kontak-jam .jam-row:first-child .jam-time', b.jam);
+  if (b.tutup_hari) setText('#kontak-jam .jam-row.closed span:first-child', b.tutup_hari);
+  if (b.tutup_ket) setText('#kontak-jam .jam-row.closed .jam-time', b.tutup_ket);
+
+  // WA links
+  if (b.wa) {
+    document.querySelectorAll('a[href*="wa.me"]').forEach(el => {
+      const href = el.getAttribute('href') || '';
+      const msgMatch = href.match(/\?text=(.+)/);
+      const msg = msgMatch ? decodeURIComponent(msgMatch[1]) : 'Halo Joglo Sablon!';
+      el.setAttribute('href', buildWA(b.wa, msg));
+    });
+  }
+
+  // ---- HERO ----
+  if (h.badge) setText('.hero-badge', h.badge);
+  if (h.judul1 || h.judul2 || h.judul3) {
+    const heroTitle = document.querySelector('.hero-title');
+    if (heroTitle) {
+      heroTitle.innerHTML =
+        `${h.judul1 || ''}<br/>` +
+        `<span class="hero-title-accent">${h.judul2 || ''}</span><br/>` +
+        (h.judul3 || '');
+    }
+  }
+  if (h.desc) setText('.hero-desc', h.desc);
+  if (h.btn1) setText('#btn-hero-wa', h.btn1);
+  if (h.btn2) setText('#btn-hero-lihat', h.btn2);
+
+  // Section headings
+  if (h.sec_layanan) setText('#layanan .section-title', h.sec_layanan);
+  if (h.sec_produk)  setText('#produk .section-title', h.sec_produk);
+  if (h.sec_video)   setText('#video-gallery .section-title', h.sec_video);
+  if (h.sec_testi)   setText('#testimoni .section-title', h.sec_testi);
+  if (h.sec_kontak)  setText('#kontak .section-title', h.sec_kontak);
+  if (h.sec_cta)     setText('.cta-content h2', h.sec_cta);
+
+  // ---- LAYANAN ----
+  if (Array.isArray(d.layanan)) {
+    const cards = document.querySelectorAll('.layanan-card');
+    d.layanan.forEach((l, i) => {
+      const card = cards[i];
+      if (!card) return;
+      const h3 = card.querySelector('h3');
+      if (h3 && l.judul) h3.textContent = l.judul;
+      const p = card.querySelector('p');
+      if (p && l.deskripsi) p.textContent = l.deskripsi;
+      const liItems = card.querySelectorAll('.layanan-features li');
+      (l.fitur || []).forEach((f, fi) => {
+        if (liItems[fi]) liItems[fi].textContent = '✓ ' + f;
+      });
+    });
+  }
+
+  // ---- PRODUK ----
+  if (Array.isArray(d.produk)) {
+    const cards = document.querySelectorAll('.produk-card');
+    d.produk.forEach((p, i) => {
+      const card = cards[i];
+      if (!card) return;
+      const img = card.querySelector('img');
+      if (img && p.img) { img.src = p.img; img.alt = p.judul; }
+      const tagEl = card.querySelector('.produk-tag');
+      if (tagEl && p.tag) tagEl.textContent = p.tag;
+      const h3 = card.querySelector('.produk-info h3');
+      if (h3 && p.judul) h3.textContent = p.judul;
+      const desc = card.querySelector('.produk-info p');
+      if (desc && p.desc) desc.textContent = p.desc;
+    });
+  }
+
+  // ---- VIDEO ----
+  if (Array.isArray(d.video)) {
+    const cards = document.querySelectorAll('.video-card');
+    d.video.forEach((v, i) => {
+      const card = cards[i];
+      if (!card) return;
+      const ytUrl = `https://www.youtube.com/embed/${v.yt_id}?autoplay=1`;
+      card.setAttribute('data-video', ytUrl);
+      card.setAttribute('data-title', v.judul);
+      const img = card.querySelector('.video-thumb');
+      if (img && v.yt_id) {
+        img.src = `https://img.youtube.com/vi/${v.yt_id}/maxresdefault.jpg`;
+        img.onerror = function() { this.src = `https://img.youtube.com/vi/${v.yt_id}/hqdefault.jpg`; };
+        img.alt = v.judul;
+      }
+      const label = card.querySelector('.video-duration');
+      if (label && v.label) label.textContent = v.label;
+      const h4 = card.querySelector('.video-info h4');
+      if (h4 && v.judul) h4.textContent = v.judul;
+      const desc = card.querySelector('.video-info p');
+      if (desc && v.desc) desc.textContent = v.desc;
+    });
+  }
+
+  // ---- TESTIMONI ----
+  if (Array.isArray(d.testimoni)) {
+    const cards = document.querySelectorAll('.testi-card');
+    d.testimoni.forEach((t, i) => {
+      const card = cards[i];
+      if (!card) return;
+      const textEl = card.querySelector('.testi-text');
+      if (textEl && t.teks) textEl.textContent = t.teks;
+      const avatarEl = card.querySelector('.testi-avatar');
+      if (avatarEl) {
+        if (t.initial) avatarEl.textContent = t.initial;
+        if (t.warna) avatarEl.style.background = t.warna;
+      }
+      const nameEl = card.querySelector('.testi-info strong');
+      if (nameEl && t.nama) nameEl.textContent = t.nama;
+      const timeEl = card.querySelector('.testi-info span');
+      if (timeEl && t.waktu) timeEl.textContent = t.waktu;
+    });
+  }
+
+  // ---- KONTAK ----
+  if (k.alamat) {
+    const alamatEl = document.querySelector('#kontak-alamat p');
+    if (alamatEl) alamatEl.innerHTML = k.alamat.replace(/\n/g, '<br/>');
+  }
+  if (k.alamat_short) setText('.footer-alamat', k.alamat_short);
+  if (k.maps_url) {
+    setAttr('a[href*="maps.app.goo.gl"]', 'href', k.maps_url);
+    setAttr('#btn-maps', 'href', k.maps_url);
+    setAttr('#btn-cta-maps', 'href', k.maps_url);
+    setAttr('#btn-map-link', 'href', k.maps_url);
+  }
+  if (k.maps_embed) {
+    const iframe = document.querySelector('.map-embed iframe');
+    if (iframe) iframe.setAttribute('src', k.maps_embed);
+  }
+}
+
+// Run on page load
+document.addEventListener('DOMContentLoaded', applyContent);
+
+// Auto-apply when admin saves (cross-tab live update via storage event)
+window.addEventListener('storage', (e) => {
+  if (e.key === 'joglo-content') {
+    applyContent();
+    // Flash a subtle indicator that content was updated
+    const flashEl = document.createElement('div');
+    flashEl.style.cssText = 'position:fixed;top:70px;right:20px;z-index:9999;background:#27AE60;color:white;font-family:Outfit,sans-serif;font-size:13px;font-weight:600;padding:10px 18px;border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,0.4);transition:opacity 0.5s ease;';
+    flashEl.textContent = '✅ Konten diperbarui dari Admin Panel';
+    document.body.appendChild(flashEl);
+    setTimeout(() => { flashEl.style.opacity = '0'; setTimeout(() => flashEl.remove(), 500); }, 2500);
+  }
+});
+
 // ===== NAVBAR SCROLL =====
 const navbar = document.getElementById('navbar');
 let lastScroll = 0;
@@ -161,6 +362,7 @@ const revealObserver = new IntersectionObserver((entries) => {
 const revealElements = [
   '.layanan-card',
   '.produk-card',
+  '.video-card',
   '.proses-step',
   '.testi-card',
   '.kontak-card',
@@ -293,6 +495,64 @@ window.addEventListener('scroll', () => {
     ticking = true;
   }
 });
+
+// ===== VIDEO GALLERY LIGHTBOX =====
+(function() {
+  const modal       = document.getElementById('video-modal');
+  const iframe      = document.getElementById('video-modal-iframe');
+  const modalTitle  = document.getElementById('video-modal-title');
+  const closeBtn    = document.getElementById('video-modal-close');
+  const backdrop    = document.getElementById('video-modal-backdrop');
+
+  if (!modal) return;
+
+  function openModal(videoUrl, title) {
+    iframe.src = videoUrl;
+    if (modalTitle) modalTitle.textContent = title || 'Video';
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    modal.classList.remove('open');
+    // Stop video by clearing src
+    setTimeout(() => { iframe.src = ''; }, 350);
+    document.body.style.overflow = '';
+  }
+
+  // Click any video card to open lightbox
+  document.querySelectorAll('.video-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const url   = card.getAttribute('data-video');
+      const title = card.getAttribute('data-title');
+      if (url) openModal(url, title);
+    });
+    // Keyboard a11y
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('role', 'button');
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        const url   = card.getAttribute('data-video');
+        const title = card.getAttribute('data-title');
+        if (url) openModal(url, title);
+      }
+    });
+  });
+
+  // Close via button
+  if (closeBtn) closeBtn.addEventListener('click', closeModal);
+
+  // Close via backdrop click
+  if (backdrop) backdrop.addEventListener('click', closeModal);
+
+  // Close via ESC key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.classList.contains('open')) {
+      closeModal();
+    }
+  });
+})();
 
 console.log('%c🎨 Joglo Sablon Kaos Blitar', 'font-size:20px;font-weight:bold;color:#C0392B;');
 console.log('%cWebsite berhasil dimuat! Hubungi kami di WA: 0822-2810-6342', 'font-size:12px;color:#666;');
