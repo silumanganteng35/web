@@ -69,7 +69,12 @@ function applyContent() {
     document.title = b.nama + ' | Sablon Berkualitas, Harga Terjangkau';
   }
   if (b.tagline) setText('.footer-tagline', b.tagline);
-  if (b.telp) { setText('.footer-telp', b.telp); setText('#kontak-phone p', b.telp); }
+  if (b.telp) {
+    setText('.footer-telp', b.telp);
+    // Selector yang benar sesuai struktur HTML: #kontak-phone > div > p
+    const phoneEl = document.querySelector('#kontak-phone div > p');
+    if (phoneEl) phoneEl.textContent = b.telp;
+  }
   if (b.rating) {
     setText('.rating-number', b.rating);
     document.querySelectorAll('.hero-badge').forEach(el => {
@@ -85,10 +90,24 @@ function applyContent() {
       if (label.includes('Tahun') && b.tahun) el.setAttribute('data-target', b.tahun);
     });
   }
-  if (b.hari) setText('#kontak-jam .jam-row:first-child span:first-child', b.hari);
-  if (b.jam) setText('#kontak-jam .jam-row:first-child .jam-time', b.jam);
-  if (b.tutup_hari) setText('#kontak-jam .jam-row.closed span:first-child', b.tutup_hari);
-  if (b.tutup_ket) setText('#kontak-jam .jam-row.closed .jam-time', b.tutup_ket);
+  // Jam operasional — selector sesuai struktur HTML aktual
+  if (b.hari || b.jam) {
+    const jamRows = document.querySelectorAll('#kontak-jam .jam-row');
+    const rowBuka = jamRows[0];
+    if (rowBuka) {
+      const spans = rowBuka.querySelectorAll('span');
+      if (b.hari && spans[0]) spans[0].textContent = b.hari;
+      if (b.jam && spans[1]) spans[1].textContent = b.jam;
+    }
+  }
+  if (b.tutup_hari || b.tutup_ket) {
+    const rowTutup = document.querySelector('#kontak-jam .jam-row.closed');
+    if (rowTutup) {
+      const spans = rowTutup.querySelectorAll('span');
+      if (b.tutup_hari && spans[0]) spans[0].textContent = b.tutup_hari;
+      if (b.tutup_ket && spans[1]) spans[1].textContent = b.tutup_ket;
+    }
+  }
 
   // WA links
   if (b.wa) {
@@ -129,14 +148,44 @@ function applyContent() {
     d.layanan.forEach((l, i) => {
       const card = cards[i];
       if (!card) return;
+
+      // Judul
       const h3 = card.querySelector('h3');
       if (h3 && l.judul) h3.textContent = l.judul;
+
+      // Deskripsi
       const p = card.querySelector('p');
       if (p && l.deskripsi) p.textContent = l.deskripsi;
+
+      // Fitur
       const liItems = card.querySelectorAll('.layanan-features li');
       (l.fitur || []).forEach((f, fi) => {
         if (liItems[fi]) liItems[fi].textContent = '✓ ' + f;
       });
+
+      // ★ POPULAR toggle: tambah/hapus class 'featured' + badge + warna ikon
+      if (l.popular) {
+        card.classList.add('featured');
+        card.style.removeProperty('color');
+        // Tambah badge Populer jika belum ada
+        if (!card.querySelector('.layanan-badge-popular')) {
+          const badge = document.createElement('div');
+          badge.className = 'layanan-badge-popular';
+          badge.textContent = 'Populer';
+          card.insertBefore(badge, card.firstChild);
+        }
+        // Set icon accent ke putih (seperti card DTF asli)
+        const icon = card.querySelector('.layanan-icon');
+        if (icon) icon.style.setProperty('--accent', '#ffffff');
+      } else {
+        card.classList.remove('featured');
+        // Hapus badge jika ada
+        const badge = card.querySelector('.layanan-badge-popular');
+        if (badge) badge.remove();
+        // Reset icon accent ke merah
+        const icon = card.querySelector('.layanan-icon');
+        if (icon) icon.style.setProperty('--accent', '#C0392B');
+      }
     });
   }
 

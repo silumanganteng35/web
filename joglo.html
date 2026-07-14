@@ -936,45 +936,91 @@
 
 <script>
 // =============================
-// AUTH — SESSION CHECK
+// AUTH — SHA-256 via Web Crypto
 // =============================
 (function () {
-  // Kunci sesi disimpan di sessionStorage (hilang saat tab ditutup)
-  var _sk = 'jsl_s';
-  // Hash sederhana untuk menyembunyikan password di source code
-  function _h(s) {
-    var h = 0, i, c;
-    for (i = 0; i < s.length; i++) {
-      c = s.charCodeAt(i);
-      h = ((h << 5) - h) + c;
-      h |= 0;
-    }
-    return h.toString(16);
+  var _sk = 'jsl_s9x';
+  var _lk = 'jsl_lk';
+
+  // SHA-256 menggunakan Web Crypto API (bawaan browser, tidak bisa di-reverse)
+  async function sha256(str) {
+    const buf = await crypto.subtle.digest('SHA-256',
+      new TextEncoder().encode(str));
+    return Array.from(new Uint8Array(buf))
+      .map(b => b.toString(16).padStart(2, '0')).join('');
   }
-  // Hash dari password "adminjsp2019"
-  var _ph = _h('adminjsp2019');
-  window._authCheck = function (input) {
-    return _h(input) === _ph;
+
+  // Hash SHA-256 dari password (dihasilkan sekali, tidak menyimpan password asli)
+  // Password saat ini: lihat README-ADMIN.txt
+  var _ph = '28e996f491b2ed01ffbe515fdb020bb5d39ba9f58988f4cd88be9c2a412af7d4';
+
+  // Token sesi: SHA-256 dari (password + tanggal YYYYMMDD) agar expire tiap hari
+  function _sessionToken(hash) {
+    var d = new Date();
+    return hash.slice(0,8) + d.getFullYear() +
+           String(d.getMonth()+1).padStart(2,'0') +
+           String(d.getDate()).padStart(2,'0');
+  }
+
+  window._authCheck = async function(input) {
+    var h = await sha256(input);
+    return h === _ph;
   };
+
+  window._getToken = function(hash) { return _sessionToken(hash); };
   window._sessionKey = _sk;
-  // Cek apakah sudah login di sesi ini
-  if (sessionStorage.getItem(_sk) === _ph) {
+  window._sha256 = sha256;
+  window._ph = _ph;
+
+  // Cek apakah sesi hari ini masih valid
+  var expected = _sessionToken(_ph);
+  if (sessionStorage.getItem(_sk) === expected) {
     document.getElementById('login-overlay').style.display = 'none';
     document.getElementById('admin-panel').classList.add('visible');
+    return;
+  }
+
+  // Cek lockout (bertahan walau halaman di-refresh)
+  var lockData = JSON.parse(localStorage.getItem(_lk) || '{}');
+  if (lockData.until && Date.now() < lockData.until) {
+    _startCountdown(lockData.until);
   }
 })();
 
 // =============================
 // LOGIN LOGIC
 // =============================
-var _failCount = 0;
-var _lockUntil = 0;
+var _failCount = parseInt(localStorage.getItem('jsl_fc') || '0');
+var _lockUntil = parseInt((JSON.parse(localStorage.getItem('jsl_lk') || '{}')).until || '0');
+var _cdTimer = null;
 
-function doLogin() {
+function _startCountdown(until) {
+  if (_cdTimer) clearInterval(_cdTimer);
+  var btn = document.getElementById('login-btn');
+  if (btn) btn.disabled = true;
+  _cdTimer = setInterval(function() {
+    var rem = Math.ceil((until - Date.now()) / 1000);
+    if (rem <= 0) {
+      clearInterval(_cdTimer);
+      showLoginError('Silakan coba kembali.');
+      if (btn) btn.disabled = false;
+      localStorage.removeItem('jsl_lk');
+      localStorage.removeItem('jsl_fc');
+      _failCount = 0;
+      _lockUntil = 0;
+    } else {
+      showLoginError('Terlalu banyak percobaan. Tunggu ' + rem + ' detik.');
+    }
+  }, 1000);
+}
+
+async function doLogin() {
   var now = Date.now();
-  if (now < _lockUntil) {
-    var wait = Math.ceil((_lockUntil - now) / 1000);
-    showLoginError('Terlalu banyak percobaan. Tunggu ' + wait + ' detik.');
+
+  // Cek lockout
+  var lockData = JSON.parse(localStorage.getItem('jsl_lk') || '{}');
+  if (lockData.until && now < lockData.until) {
+    _startCountdown(lockData.until);
     return;
   }
 
@@ -985,12 +1031,20 @@ function doLogin() {
     return;
   }
 
-  if (window._authCheck(pass)) {
-    // Login berhasil
+  // Disable tombol saat proses
+  var btn = document.getElementById('login-btn');
+  btn.disabled = true;
+  btn.textContent = '🔄 Memeriksa...';
+
+  var ok = await window._authCheck(pass);
+  btn.textContent = '🔐 Masuk ke Admin Panel';
+
+  if (ok) {
     _failCount = 0;
-    sessionStorage.setItem(window._sessionKey, (function(s){
-      var h=0,i,c;for(i=0;i<s.length;i++){c=s.charCodeAt(i);h=((h<<5)-h)+c;h|=0;}return h.toString(16);
-    })('adminjsp2019'));
+    localStorage.removeItem('jsl_fc');
+    localStorage.removeItem('jsl_lk');
+    var token = window._getToken(window._ph);
+    sessionStorage.setItem(window._sessionKey, token);
     document.getElementById('login-overlay').style.transition = 'opacity 0.4s ease';
     document.getElementById('login-overlay').style.opacity = '0';
     setTimeout(function () {
@@ -999,18 +1053,25 @@ function doLogin() {
       loadData();
     }, 400);
   } else {
-    // Login gagal
     _failCount++;
+    localStorage.setItem('jsl_fc', _failCount);
     shakeBox();
+
     if (_failCount >= 5) {
-      _lockUntil = Date.now() + 30000; // Kunci 30 detik
-      showLoginError('Terlalu banyak percobaan. Tunggu 30 detik.');
+      // Kunci 5 menit setelah 5x salah, 30 menit setelah 10x
+      var lockMs = _failCount >= 10 ? 1800000 : 300000;
+      var until = Date.now() + lockMs;
+      localStorage.setItem('jsl_lk', JSON.stringify({ until: until }));
+      localStorage.setItem('jsl_fc', '0');
       _failCount = 0;
+      btn.disabled = true;
+      _startCountdown(until);
     } else {
+      btn.disabled = false;
       showLoginError('Password salah. Percobaan ke-' + _failCount + ' dari 5.');
+      document.getElementById('login-pass').value = '';
+      document.getElementById('login-pass').focus();
     }
-    document.getElementById('login-pass').value = '';
-    document.getElementById('login-pass').focus();
   }
 }
 
@@ -1022,6 +1083,7 @@ function doLogout() {
   document.getElementById('login-overlay').style.display = 'flex';
   document.getElementById('login-pass').value = '';
   hideLoginError();
+  setTimeout(() => document.getElementById('login-pass')?.focus(), 300);
 }
 
 function showLoginError(msg) {
