@@ -762,9 +762,46 @@
           </div>
         </div>
       </div>
+
+      <!-- LOGO UPLOAD CARD -->
+      <div class="edit-card">
+        <div class="edit-card-header"><h3>🖼️ Logo Navbar</h3></div>
+        <div style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;">
+
+          <!-- Preview -->
+          <div style="flex-shrink:0;">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text2);margin-bottom:10px;">Preview</div>
+            <div style="width:80px;height:80px;border:2px dashed var(--border);border-radius:12px;display:flex;align-items:center;justify-content:center;background:var(--surface2);overflow:hidden;" id="logo-preview-wrap">
+              <img id="logo-preview-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:contain;padding:6px;" />
+              <svg id="logo-preview-placeholder" width="32" height="32" viewBox="0 0 36 36" fill="none">
+                <path d="M18 2L32 10V26L18 34L4 26V10L18 2Z" fill="#C0392B" opacity="0.15"/>
+                <path d="M18 5L30 12V24L18 31L6 24V12L18 5Z" stroke="#C0392B" stroke-width="1.5" fill="none"/>
+                <path d="M10 14H26M10 14L8 18H28L26 14M12 18V24H24V18" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <button onclick="resetLogo()" style="margin-top:8px;width:80px;font-size:11px;padding:5px 0;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text2);cursor:pointer;">🗑 Reset</button>
+          </div>
+
+          <!-- Controls -->
+          <div style="flex:1;min-width:200px;">
+            <div class="form-group" style="margin-bottom:14px;">
+              <label>Upload Gambar Logo</label>
+              <input type="file" id="b-logo-file" accept="image/*" onchange="onLogoFileChange(event)"
+                style="display:block;width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;padding:9px 12px;cursor:pointer;" />
+              <span class="input-hint">PNG/SVG/JPG — disimpan langsung ke browser (maks ~1MB)</span>
+            </div>
+            <div class="form-group">
+              <label>— atau — URL Gambar (jika sudah di hosting)</label>
+              <input type="url" id="b-logo-url" placeholder="https://contoh.com/logo.png"
+                oninput="onLogoUrlInput(this.value)" />
+              <span class="input-hint">Kosongkan untuk pakai logo default (icon hexagonal)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
 
-    <!-- ===== TAB: HERO ===== -->
     <div class="tab-pane" id="tab-hero">
       <div class="pane-header">
         <h2>🎯 Hero Section</h2>
@@ -1131,7 +1168,8 @@ const DEFAULTS = {
     hari: 'Senin – Sabtu',
     jam: '08.00 – 17.00 WIB',
     tutup_hari: 'Minggu',
-    tutup_ket: 'Tutup'
+    tutup_ket: 'Tutup',
+    logo_url: ''
   },
   hero: {
     badge: '4.9 Rating · 156+ Pelanggan Puas',
@@ -1160,7 +1198,7 @@ const DEFAULTS = {
     { judul: 'Berbagai Pilihan Desain', desc: 'Sesuai Keinginan Anda', tag: 'Custom Design', img: 'images/custom_tshirt_designs.png' }
   ],
   video: [
-    { judul: 'Proses Sablon Screen Printing', desc: 'Teknik sablon manual yang menghasilkan warna tajam dan tahan lama', label: 'Sablon Manual', yt_id: 'Y7eSvQx3t5s' },
+    { judul: 'Proses Sablon Screen Printing', desc: 'Teknik sablon manual yang menghasilkan warna tajam dan tahan lama', label: 'Sablon Manual', yt_id: 'fBlvEiSLc9E' },
     { judul: 'Teknologi DTF Printing', desc: 'Full color detail tinggi untuk desain kompleks dan foto', label: 'Sablon DTF', yt_id: 'RHlZhRTRRpQ' },
     { judul: 'Hasil Kaos Custom Berkualitas', desc: 'Review hasil akhir sablon premium yang memuaskan pelanggan', label: 'Kaos Custom', yt_id: 'KpkBCMYH5dY' },
     { judul: 'Behind The Scenes Workshop', desc: 'Intip langsung kesibukan di workshop produksi kami', label: 'Behind The Scenes', yt_id: '4BJfQ4yHJeI' }
@@ -1188,7 +1226,27 @@ let isDirty = false;
 // =============================
 function loadData() {
   const saved = localStorage.getItem('joglo-content');
-  data = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(DEFAULTS));
+  const def   = JSON.parse(JSON.stringify(DEFAULTS));
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+      // Deep merge: data lama + field baru dari DEFAULTS
+      data = {
+        bisnis:    Object.assign({}, def.bisnis,    parsed.bisnis    || {}),
+        hero:      Object.assign({}, def.hero,       parsed.hero      || {}),
+        layanan:   Array.isArray(parsed.layanan)    ? parsed.layanan.map((l, i) => Object.assign({}, def.layanan[i] || {}, l)) : def.layanan,
+        produk:    Array.isArray(parsed.produk)     ? parsed.produk.map((p, i)  => Object.assign({}, def.produk[i]  || {}, p)) : def.produk,
+        video:     Array.isArray(parsed.video)      ? parsed.video.map((v, i)   => Object.assign({}, def.video[i]   || {}, v)) : def.video,
+        testimoni: Array.isArray(parsed.testimoni)  ? parsed.testimoni.map((t, i) => Object.assign({}, def.testimoni[i] || {}, t)) : def.testimoni,
+        kontak:    Object.assign({}, def.kontak,    parsed.kontak    || {})
+      };
+    } catch (e) {
+      // Data korup → pakai DEFAULTS
+      data = def;
+    }
+  } else {
+    data = def;
+  }
   fillForms();
   updateStatus(false);
 }
@@ -1237,6 +1295,9 @@ function fillForms() {
   setVal('b-pelanggan', b.pelanggan); setVal('b-tahun', b.tahun);
   setVal('b-hari', b.hari); setVal('b-jam', b.jam);
   setVal('b-tutup-hari', b.tutup_hari); setVal('b-tutup-ket', b.tutup_ket);
+  // Logo
+  setVal('b-logo-url', b.logo_url || '');
+  _showLogoPreview(b.logo_url || '');
 
   // Hero
   const h = data.hero;
@@ -1279,7 +1340,8 @@ function collectForms() {
     pelanggan: parseInt(getVal('b-pelanggan')) || 0,
     tahun: parseInt(getVal('b-tahun')) || 0,
     hari: getVal('b-hari'), jam: getVal('b-jam'),
-    tutup_hari: getVal('b-tutup-hari'), tutup_ket: getVal('b-tutup-ket')
+    tutup_hari: getVal('b-tutup-hari'), tutup_ket: getVal('b-tutup-ket'),
+    logo_url: getVal('b-logo-url') || data.bisnis?.logo_url || ''
   };
   data.hero = {
     badge: getVal('h-badge'), judul1: getVal('h-judul1'),
@@ -1334,7 +1396,7 @@ function renderLayanan() {
   cont.innerHTML = data.layanan.map((l, i) => `
     <div class="edit-card">
       <div class="edit-card-header">
-        <h3>Kartu ${i + 1} <span class="card-badge">${l.popular ? '⭐ Populer' : `Layanan ${i+1}`}</span></h3>
+        <h3>Kartu ${i + 1} <span class="card-badge">${l.popular ? '⭐ Populer' : 'Layanan ' + (i+1)}</span></h3>
       </div>
       <div class="form-grid">
         <div class="form-group">
@@ -1472,6 +1534,55 @@ function updateThumb(i) {
   const id = document.getElementById(`v-ytid-${i}`)?.value.trim();
   const img = document.getElementById(`v-thumb-${i}`);
   if (img && id) img.src = `https://img.youtube.com/vi/${id}/mqdefault.jpg`;
+}
+
+// =============================
+// LOGO MANAGEMENT
+// =============================
+function _showLogoPreview(url) {
+  const img = document.getElementById('logo-preview-img');
+  const ph  = document.getElementById('logo-preview-placeholder');
+  if (!img || !ph) return;
+  if (url) {
+    img.src = url;
+    img.style.display = 'block';
+    ph.style.display  = 'none';
+  } else {
+    img.src = '';
+    img.style.display = 'none';
+    ph.style.display  = 'block';
+  }
+}
+
+function onLogoFileChange(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (file.size > 1.2 * 1024 * 1024) {
+    showToast('❌ File terlalu besar! Maks 1MB.', true);
+    event.target.value = '';
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const dataUrl = e.target.result;
+    document.getElementById('b-logo-url').value = dataUrl;
+    _showLogoPreview(dataUrl);
+    updateStatus(true);
+  };
+  reader.readAsDataURL(file);
+}
+
+function onLogoUrlInput(url) {
+  _showLogoPreview(url);
+  updateStatus(true);
+}
+
+function resetLogo() {
+  document.getElementById('b-logo-url').value = '';
+  document.getElementById('b-logo-file').value = '';
+  _showLogoPreview('');
+  updateStatus(true);
+  showToast('🔄 Logo direset ke default.');
 }
 
 function esc(str) {

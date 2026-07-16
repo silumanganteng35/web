@@ -323,11 +323,11 @@
       <div class="video-grid">
 
         <!-- Video Card 1 -->
-        <div class="video-card" id="vid-1" data-video="https://www.youtube.com/embed/Y7eSvQx3t5s?autoplay=1" data-title="Proses Sablon Kaos Manual - Screen Printing">
+        <div class="video-card" id="vid-1" data-video="https://www.youtube.com/embed/fBlvEiSLc9E?si=PEUfXIEQXPT32Rqe&autoplay=1" data-title="Screenprinting JSP | Custom Kaos Satuan">
           <div class="video-thumb-wrap">
-            <img src="https://img.youtube.com/vi/Y7eSvQx3t5s/maxresdefault.jpg"
-                 onerror="this.src='https://img.youtube.com/vi/Y7eSvQx3t5s/hqdefault.jpg'"
-                 alt="Proses Sablon Manual" loading="lazy" class="video-thumb" />
+            <img src="https://img.youtube.com/vi/fBlvEiSLc9E/maxresdefault.jpg"
+                 onerror="this.src='https://img.youtube.com/vi/fBlvEiSLc9E/hqdefault.jpg'"
+                 alt="Screenprinting JSP Custom Kaos" loading="lazy" class="video-thumb" />
             <div class="video-overlay">
               <div class="play-btn" aria-label="Putar video">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
@@ -427,9 +427,19 @@
                 src=""
                 title="Video Player"
                 frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowfullscreen>
         </iframe>
+        <!-- Fallback jika video tidak bisa diembed -->
+        <div id="video-modal-fallback" style="display:none;position:absolute;inset:0;background:#111;display:none;align-items:center;justify-content:center;flex-direction:column;gap:20px;">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="#C0392B"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.28 8.28 0 004.84 1.56V6.8a4.85 4.85 0 01-1.07-.11z"/></svg>
+          <p style="color:#ccc;font-size:15px;text-align:center;padding:0 24px;">Video tidak dapat diputar di sini karena pembatasan dari YouTube.</p>
+          <a id="video-modal-yt-link" href="#" target="_blank" rel="noopener"
+             style="display:inline-flex;align-items:center;gap:10px;background:#FF0000;color:#fff;padding:14px 28px;border-radius:50px;font-weight:700;font-size:15px;text-decoration:none;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M10 15l5.19-3L10 9v6m11.56-7.83c.13.47.22 1.1.28 1.9.07.8.1 1.49.1 2.09L22 12c0 2.19-.16 3.8-.44 4.83-.25.9-.83 1.48-1.73 1.73-.47.13-1.33.22-2.65.28-1.3.07-2.49.1-3.59.1L12 19c-4.19 0-6.8-.16-7.83-.44-.9-.25-1.48-.83-1.73-1.73-.13-.47-.22-1.1-.28-1.9-.07-.8-.1-1.49-.1-2.09L2 12c0-2.19.16-3.8.44-4.83.25-.9.83-1.48 1.73-1.73.47-.13 1.33-.22 2.65-.28 1.3-.07 2.49-.1 3.59-.1L12 5c4.19 0 6.8.16 7.83.44.9.25 1.48.83 1.73 1.73z"/></svg>
+            Tonton di YouTube
+          </a>
+        </div>
       </div>
     </div>
   </div>

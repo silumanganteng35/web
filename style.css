@@ -811,9 +811,9 @@ ul { list-style: none; }
 
 .produk-grid {
   display: grid;
-  grid-template-columns: 1.5fr 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
-  align-items: start;
+  align-items: stretch;
 }
 
 .produk-card {
@@ -831,19 +831,17 @@ ul { list-style: none; }
 
 .produk-img-wrap {
   position: relative;
-  overflow: hidden;
   aspect-ratio: 4/3;
+  background: #111;
 }
 
-.produk-card.large .produk-img-wrap {
-  aspect-ratio: 3/2;
-}
 
 .produk-img-wrap img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   transition: transform 0.5s ease;
+  padding: 8px;
 }
 
 .produk-card:hover .produk-img-wrap img {

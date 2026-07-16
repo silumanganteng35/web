@@ -69,6 +69,23 @@ function applyContent() {
     document.title = b.nama + ' | Sablon Berkualitas, Harga Terjangkau';
   }
   if (b.tagline) setText('.footer-tagline', b.tagline);
+
+  // ★ LOGO — ganti icon hexagonal dengan gambar custom
+  const logoIconEls = document.querySelectorAll('.logo-icon');
+  if (b.logo_url) {
+    logoIconEls.forEach(el => {
+      // Hanya ganti jika belum jadi img
+      if (!el.querySelector('img')) {
+        el.innerHTML = '';
+      }
+      el.innerHTML = `<img src="${b.logo_url}" alt="Logo" style="width:36px;height:36px;object-fit:contain;display:block;" onerror="this.style.display='none'" />`;
+    });
+  } else {
+    // Reset ke SVG default jika logo_url dikosongkan
+    const svgDefault = `<svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18 2L32 10V26L18 34L4 26V10L18 2Z" fill="#C0392B" opacity="0.15"/><path d="M18 5L30 12V24L18 31L6 24V12L18 5Z" stroke="#C0392B" stroke-width="1.5" fill="none"/><path d="M10 14H26M10 14L8 18H28L26 14M12 18V24H24V18" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    logoIconEls.forEach(el => { el.innerHTML = svgDefault; });
+  }
+
   if (b.telp) {
     setText('.footer-telp', b.telp);
     // Selector yang benar sesuai struktur HTML: #kontak-phone > div > p
@@ -547,61 +564,45 @@ window.addEventListener('scroll', () => {
 
 // ===== VIDEO GALLERY LIGHTBOX =====
 (function() {
-  const modal       = document.getElementById('video-modal');
-  const iframe      = document.getElementById('video-modal-iframe');
-  const modalTitle  = document.getElementById('video-modal-title');
-  const closeBtn    = document.getElementById('video-modal-close');
-  const backdrop    = document.getElementById('video-modal-backdrop');
+  const modal    = document.getElementById('video-modal');
+  const iframe   = document.getElementById('video-modal-iframe');
+  const title    = document.getElementById('video-modal-title');
+  const closeBtn = document.getElementById('video-modal-close');
+  const backdrop = document.getElementById('video-modal-backdrop');
+  const fallback = document.getElementById('video-modal-fallback');
+  const ytLink   = document.getElementById('video-modal-yt-link');
 
   if (!modal) return;
 
-  function openModal(videoUrl, title) {
-    iframe.src = videoUrl;
-    if (modalTitle) modalTitle.textContent = title || 'Video';
-    modal.classList.add('open');
-    document.body.style.overflow = 'hidden';
+  let fallbackTimer = null;
+
+  function extractYtId(url) {
+    const m = url.match(/embed\/([^?&]+)/);
+    return m ? m[1] : null;
   }
 
-  function closeModal() {
-    modal.classList.remove('open');
-    // Stop video by clearing src
-    setTimeout(() => { iframe.src = ''; }, 350);
-    document.body.style.overflow = '';
-  }
-
-  // Click any video card to open lightbox
+  // Click any video card → buka YouTube langsung di tab baru
   document.querySelectorAll('.video-card').forEach(card => {
     card.addEventListener('click', () => {
-      const url   = card.getAttribute('data-video');
-      const title = card.getAttribute('data-title');
-      if (url) openModal(url, title);
+      const url = card.getAttribute('data-video');
+      const ytId = extractYtId(url || '');
+      if (ytId) {
+        window.open('https://www.youtube.com/watch?v=' + ytId, '_blank', 'noopener');
+      } else if (url) {
+        window.open(url, '_blank', 'noopener');
+      }
     });
-    // Keyboard a11y
     card.setAttribute('tabindex', '0');
     card.setAttribute('role', 'button');
     card.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
-        const url   = card.getAttribute('data-video');
-        const title = card.getAttribute('data-title');
-        if (url) openModal(url, title);
+        card.click();
       }
     });
   });
-
-  // Close via button
-  if (closeBtn) closeBtn.addEventListener('click', closeModal);
-
-  // Close via backdrop click
-  if (backdrop) backdrop.addEventListener('click', closeModal);
-
-  // Close via ESC key
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && modal.classList.contains('open')) {
-      closeModal();
-    }
-  });
 })();
+
 
 console.log('%c🎨 Joglo Sablon Kaos Blitar', 'font-size:20px;font-weight:bold;color:#C0392B;');
 console.log('%cWebsite berhasil dimuat! Hubungi kami di WA: 0822-2810-6342', 'font-size:12px;color:#666;');
